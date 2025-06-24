@@ -41,7 +41,7 @@ GUI_DisplayType_t gScreenToDisplay;
 GUI_DisplayType_t gRequestDisplayScreen = DISPLAY_INVALID;
 GUI_AppType_t gAppToDisplay = APP_SPLIT;
 
-const App apps[5] = {
+const App apps[4] = {
     {""},
     {"Split"},
     {"Scanner"},

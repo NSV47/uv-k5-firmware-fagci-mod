@@ -102,5 +102,14 @@ void HELLOWORLD_render() {
   
   }
 #endif
+
+  UI_ClearAppScreen();
+#if 0  
+  for (uint8_t line = 2; line < 7; line++) {
+    memset(gFrameBuffer[line], 0, LCD_WIDTH);
+  }
+#endif
+  UI_PrintStringSmallest("Hello World app", 0, 32, false, true);
+
   ST7565_BlitFullScreen();
 }

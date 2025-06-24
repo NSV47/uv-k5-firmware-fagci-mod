@@ -52,7 +52,7 @@ typedef struct App {
   void (*key)(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 } App;
 
-extern const App apps[5];
+extern const App apps[4];
 
 extern GUI_DisplayType_t gScreenToDisplay;
 extern GUI_DisplayType_t gRequestDisplayScreen;
