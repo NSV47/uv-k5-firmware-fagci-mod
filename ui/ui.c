@@ -27,6 +27,7 @@
 #endif
 #include "../apps/abscanner.h"
 #include "../apps/scanlist.h"
+#include "../apps/helloWorld.h"
 #include "appmenu.h"
 #include "contextmenu.h"
 #include "fmradio.h"
@@ -40,11 +41,12 @@ GUI_DisplayType_t gScreenToDisplay;
 GUI_DisplayType_t gRequestDisplayScreen = DISPLAY_INVALID;
 GUI_AppType_t gAppToDisplay = APP_SPLIT;
 
-const App apps[4] = {
+const App apps[5] = {
     {""},
     {"Split"},
     {"Scanner"},
-    {"Scanlist", NULL, SCANLIST_update, SCANLIST_render, SCANLIST_key},
+    // {"Scanlist", NULL, SCANLIST_update, SCANLIST_render, SCANLIST_key},
+    {"HelloWorld", NULL, HELLOWORLD_update, HELLOWORLD_render, HELLOWORLD_key},
     /* {"A to B scanner", ABSCANNER_init, ABSCANNER_update, ABSCANNER_render,
      ABSCANNER_key}, */
 };

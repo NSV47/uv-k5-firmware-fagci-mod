@@ -122,7 +122,9 @@ OBJS += ui/welcome.o
 OBJS += ui/split.o
 
 OBJS += apps/abscanner.o
-OBJS += apps/scanlist.o
+# OBJS += apps/scanlist.o
+
+OBJS += apps/helloWorld.o
 
 OBJS += version.o
 
