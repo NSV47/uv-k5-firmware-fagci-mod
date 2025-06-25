@@ -43,10 +43,10 @@ GUI_AppType_t gAppToDisplay = APP_SPLIT;
 
 const App apps[4] = {
     {""},
-    {"Split"},
-    {"Scanner"},
+    // {"Split"},
+    // {"Scanner"},
     // {"Scanlist", NULL, SCANLIST_update, SCANLIST_render, SCANLIST_key},
-    {"HelloWorld", NULL, HELLOWORLD_update, HELLOWORLD_render, HELLOWORLD_key},
+    // {"HelloWorld", NULL, HELLOWORLD_update, HELLOWORLD_render, HELLOWORLD_key},
     /* {"A to B scanner", ABSCANNER_init, ABSCANNER_update, ABSCANNER_render,
      ABSCANNER_key}, */
 };

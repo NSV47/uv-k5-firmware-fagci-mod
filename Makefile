@@ -123,9 +123,9 @@ OBJS += ui/split.o
 
 OBJS += apps/abscanner.o
 # OBJS += apps/scanlist.o
-
-OBJS += apps/helloWorld.o
-
+# -------------------------------------
+# OBJS += apps/helloWorld.o
+# -------------------------------------
 OBJS += version.o
 
 OBJS += main.o

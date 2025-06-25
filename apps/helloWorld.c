@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 static uint16_t cursor;
+uint32_t counter;
 
 void helloWorldUpdate(uint8_t Channel, uint8_t val) {
 #if 0  
@@ -28,9 +29,30 @@ void helloWorldUpdate(uint8_t Channel, uint8_t val) {
   State[Channel & 7U] = gMR_ChannelAttributes[Channel];
   EEPROM_WriteBuffer(Offset, State);
 #endif  
+  // BK4819_PlayTone(1200, true);
+  // RADIO_enableTX();
+  // BK4819_TransmitTone(true, 1200);
+  // uint16_t buff[4]={'t','e','s','t'};
+  // BK4819_SendFSKData(buff);
+  // BK4819_SetupPowerAmplifier(0, 0);
+  // BK4819_ToggleGpioOut(BK4819_GPIO1_PIN29_PA_ENABLE, false);
 }
 
-void HELLOWORLD_update() {}
+void HELLOWORLD_update() {
+  // counter++;
+#if 0  
+  uint32_t primask = __get_PRIMASK();;
+  __disable_irq();
+  //--critical section?--
+  
+  //---------------------
+  __set_PRIMASK(primask);
+  
+#endif  
+  
+  RADIO_enableTX();
+  BK4819_TransmitTone(false, 1200);
+}
 
 void HELLOWORLD_key(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
   if (bKeyPressed) {

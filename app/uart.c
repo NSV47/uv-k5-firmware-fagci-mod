@@ -574,7 +574,35 @@ void UART_HandleCommand(void) {
     break;
 
   case 0x0521:
+    ;
     // Not implementing non-authentic command
+    // RADIO_enableTX();
+    // uint16_t tmpBuff[4]={'t','e','s','t'};
+    // BK4819_SendFSKData(tmpBuff);
+	  // BK4819_SetupPowerAmplifier(0, 0);
+	  // BK4819_ToggleGpioOut(BK4819_GPIO1_PIN29_PA_ENABLE, false);
+    // BK4819_PlayTone(1200, true);
+    // UART_Send("Ok\r\n", 4);
+    // BK4819_TransmitTone(false, 1750);
+  #if 0  
+    uint32_t primask = __get_PRIMASK();;
+    __disable_irq();
+    //--critical section?--
+
+    //---------------------
+    __set_PRIMASK(primask);
+    
+  #endif
+    
+    RADIO_enableTX();
+    BK4819_TransmitTone(false, 1200);
+    // BK4819_TransmitTone(true, 2400);
+    // BK4819_TransmitTone(true, 1200);
+    // BK4819_TransmitTone(true, 2400);
+    // RADIO_disableTX();
+    
+    UART_Send("Ok\r\n", 4);
+    // SYSTEM_DelayMs(1000);
     break;
 
   case 0x0527:
