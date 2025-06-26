@@ -37,6 +37,10 @@ static volatile uint32_t gGlobalSysTickCounter;
 
 void SystickHandler(void);
 
+uint32_t millis(void) {
+    return gGlobalSysTickCounter;
+}
+
 void SystickHandler(void) {
   gGlobalSysTickCounter++;
   gNextTimeslice = true;

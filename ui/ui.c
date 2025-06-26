@@ -41,12 +41,12 @@ GUI_DisplayType_t gScreenToDisplay;
 GUI_DisplayType_t gRequestDisplayScreen = DISPLAY_INVALID;
 GUI_AppType_t gAppToDisplay = APP_SPLIT;
 
-const App apps[4] = {
+const App apps[3] = {
     {""},
-    // {"Split"},
+    {"Split"}, // кажеься что если это отключить, то вся прошивка работает криво
     // {"Scanner"},
     // {"Scanlist", NULL, SCANLIST_update, SCANLIST_render, SCANLIST_key},
-    // {"HelloWorld", NULL, HELLOWORLD_update, HELLOWORLD_render, HELLOWORLD_key},
+    {"HelloWorld", NULL, HELLOWORLD_update, HELLOWORLD_render, HELLOWORLD_key},
     /* {"A to B scanner", ABSCANNER_init, ABSCANNER_update, ABSCANNER_render,
      ABSCANNER_key}, */
 };

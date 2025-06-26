@@ -94,6 +94,7 @@ extern uint16_t gEEPROM_1F8C;
 extern uint8_t gMR_ChannelAttributes[207];
 
 extern volatile bool gNextTimeslice500ms;
+// extern volatile uint32_t millis_counter;
 extern volatile uint16_t gBatterySaveCountdown;
 extern volatile uint16_t gDualWatchCountdown;
 extern volatile uint16_t gTxTimerCountdown;

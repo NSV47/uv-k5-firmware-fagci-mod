@@ -19,6 +19,8 @@
 #include "driver/system.h"
 #include "driver/systick.h"
 
+volatile uint32_t millis_counter = 0;  // Счётчик миллисекунд
+
 void SYSTEM_DelayMs(uint32_t Delay)
 {
 	SYSTICK_DelayUs(Delay * 1000);

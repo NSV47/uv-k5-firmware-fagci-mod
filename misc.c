@@ -47,6 +47,7 @@ uint16_t gEEPROM_1F8C;
 uint8_t gMR_ChannelAttributes[FREQ_CHANNEL_LAST + 1];
 
 volatile bool gNextTimeslice500ms;
+// volatile uint32_t millis_counter;
 volatile uint16_t gBatterySaveCountdown = 1000;
 volatile uint16_t gDualWatchCountdown;
 volatile uint16_t gTxTimerCountdown;
