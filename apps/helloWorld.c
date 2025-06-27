@@ -121,13 +121,25 @@ void cwTx(char* msg)
 }
 #endif
 
+
+
+#ifdef RECEIVER
+uint8_t mygFSKWriteIndex=0;
 void APP_myCheckRadioInterrupts(void) {
-  
+#if 0  
+  for(uint8_t i=0;i<36;++i){
+    my_FSK_Buffer[i]=i+1;
+  }
+  for(uint8_t i=0;i<36;++i){
+    UART_Send((const void *)&my_FSK_Buffer[i], 1);
+  }
+  UART_Send("\r\n", 2);
+#endif
   while (BK4819_ReadRegister(BK4819_REG_0C) & 1U) {
     
     // uint16_t Mask;
 
-    BK4819_WriteRegister(BK4819_REG_02, 0);
+    // BK4819_WriteRegister(BK4819_REG_02, 0);
     // Mask = BK4819_ReadRegister(BK4819_REG_02);
     
     // if (Mask & BK4819_REG_02_FSK_FIFO_ALMOST_FULL/* &&
@@ -136,23 +148,30 @@ void APP_myCheckRadioInterrupts(void) {
       // {
       // UART_Send("1\r\n", 3);    
       // uint8_t i;
-      uint8_t mygFSKWriteIndex=0;
+      
 
       // for (i = 0; i < 4; i++) {
-        my_FSK_Buffer[mygFSKWriteIndex++] = BK4819_ReadRegister(BK4819_REG_5F);
+        // my_FSK_Buffer[mygFSKWriteIndex++] = BK4819_ReadRegister(BK4819_REG_5F);
+        uint16_t value = BK4819_ReadRegister(BK4819_REG_5F);
+        UART_Send((const void *)&value, 1);
       // }
       // AIRCOPY_StorePacket();
       // mygFSKWriteIndex=0;
-      uint16_t Status;
-      Status = BK4819_ReadRegister(BK4819_REG_0B);
+      // uint16_t Status;
+      // Status = BK4819_ReadRegister(BK4819_REG_0B);
       BK4819_PrepareFSKReceive();
-      if ((Status & 0x0010U) == 0/* && g_FSK_Buffer[0] == 0xABCD && g_FSK_Buffer[35] == 0xDCBA */) {
-        UART_Send(my_FSK_Buffer, sizeof(my_FSK_Buffer));
-      }
+      // const void *pBuffer = (const void *)&my_FSK_Buffer[0];
+      // UART_Send(pBuffer, sizeof(&my_FSK_Buffer[0]));
+      // for(uint8_t i=0;i<36;++i){
+        // UART_Send((const void *)&my_FSK_Buffer[i], 1);
+      // }
+      // if ((Status & 0x0010U) == 0/* && g_FSK_Buffer[0] == 0xABCD && g_FSK_Buffer[35] == 0xDCBA */) {
+        // UART_Send(my_FSK_Buffer, sizeof(my_FSK_Buffer));
+      // }
     // }
   }
 }
-
+#endif
 void helloWorldUpdate(uint8_t Channel, uint8_t val) {
 #if 0  
   uint8_t State[8];
@@ -219,11 +238,14 @@ void HELLOWORLD_update() {
     // timer_1=millis();
     // cwTx("NSV");
     
-    memset(my_FSK_Buffer,'1',36); // заполнить первые 12 байт символом '_'
+    // memset(my_FSK_Buffer,'1',36); // заполнить первые 12 байт символом '_'
+    for(uint8_t i=0;i<36;++i){
+      my_FSK_Buffer[i]=i+1;
+    }
     if(flag_action){
       flag_action=false;
       RADIO_enableTX();
-	    BK4819_SendFSKData(my_FSK_Buffer);
+	    BK4819_SendFSKData(&my_FSK_Buffer[0]);
 	    BK4819_SetupPowerAmplifier(0, 0);
 	    BK4819_ToggleGpioOut(BK4819_GPIO1_PIN29_PA_ENABLE, false);
     }
