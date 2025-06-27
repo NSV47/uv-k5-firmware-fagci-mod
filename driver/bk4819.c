@@ -23,6 +23,8 @@
 #include "../driver/uart.h"
 #include "../misc.h"
 
+#define ENABLE_AIRCOPY
+
 static const uint16_t FSK_RogerTable[7] = {
     0xF1A2, 0x7446, 0x61A4, 0x6544, 0x4E8A, 0xE044, 0xEA84,
 };

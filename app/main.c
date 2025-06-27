@@ -191,7 +191,7 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
 
   case KEY_5:
     gCurrentFunction = 0;
-    APP_RunSpectrum();
+    // APP_RunSpectrum(); // выкидываю для экономии места
     gRequestDisplayScreen = DISPLAY_MAIN;
     break;
 

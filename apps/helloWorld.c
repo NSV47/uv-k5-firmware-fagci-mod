@@ -6,13 +6,26 @@
 #include "../ui/ui.h"
 #include <stdio.h>
 #include "../scheduler.h"
+#include "../app/aircopy.h"
+// #include "../driver/bk4819.h"
 
 // cw dot length in ms
 #define CW_DOT_LEN 120
 
+#define RECEIVER
+
+// Макрос для размещения строк во Flash
+// #define FLASH_STR(str) ((const uint8_t*)(str))
+
+// const uint8_t flash_msg[] __attribute__((section(".rodata"))) = "Hello from Flash!\r\n";
+
+uint16_t my_FSK_Buffer[36];
+
+bool flag_action = true;
+
 // static uint16_t cursor;
 uint32_t timer_1=0;
-
+#if 0
 const uint8_t cwSymbTab[][5] = {
   {1, 2},             // 0  A
   {2, 1, 1, 1},       // 1  B
@@ -51,7 +64,8 @@ const uint8_t cwSymbTab[][5] = {
   {2, 2, 2, 1, 1},    // 34 8
   {2, 2, 2, 2, 1}     // 35 9
 };
-
+#endif
+#if 0
 void cwSendSym(uint16_t len)
 {
   // si5351.output_enable(SI5351_CLK0, 1);
@@ -66,7 +80,8 @@ void cwSendSym(uint16_t len)
   // digitalWrite(2,LOW);
   RADIO_disableTX();
 }
-
+#endif
+#if 0
 void cwTxChar(char ch)
 {
     uint8_t cwSym;
@@ -94,7 +109,8 @@ void cwTxChar(char ch)
 
     SYSTEM_DelayMs(CW_DOT_LEN * 2);
 }
-
+#endif
+#if 0
 void cwTx(char* msg)
 {
   // digitalWrite(6,HIGH);
@@ -102,6 +118,39 @@ void cwTx(char* msg)
     cwTxChar(msg[i]);
   }
   // digitalWrite(6,LOW );
+}
+#endif
+
+void APP_myCheckRadioInterrupts(void) {
+  
+  while (BK4819_ReadRegister(BK4819_REG_0C) & 1U) {
+    
+    // uint16_t Mask;
+
+    BK4819_WriteRegister(BK4819_REG_02, 0);
+    // Mask = BK4819_ReadRegister(BK4819_REG_02);
+    
+    // if (Mask & BK4819_REG_02_FSK_FIFO_ALMOST_FULL/* &&
+        // gScreenToDisplay == DISPLAY_AIRCOPY &&
+        // gAircopyState == AIRCOPY_TRANSFER && gAirCopyIsSendMode == 0*/) 
+      // {
+      // UART_Send("1\r\n", 3);    
+      // uint8_t i;
+      uint8_t mygFSKWriteIndex=0;
+
+      // for (i = 0; i < 4; i++) {
+        my_FSK_Buffer[mygFSKWriteIndex++] = BK4819_ReadRegister(BK4819_REG_5F);
+      // }
+      // AIRCOPY_StorePacket();
+      // mygFSKWriteIndex=0;
+      uint16_t Status;
+      Status = BK4819_ReadRegister(BK4819_REG_0B);
+      BK4819_PrepareFSKReceive();
+      if ((Status & 0x0010U) == 0/* && g_FSK_Buffer[0] == 0xABCD && g_FSK_Buffer[35] == 0xDCBA */) {
+        UART_Send(my_FSK_Buffer, sizeof(my_FSK_Buffer));
+      }
+    // }
+  }
 }
 
 void helloWorldUpdate(uint8_t Channel, uint8_t val) {
@@ -144,15 +193,49 @@ void HELLOWORLD_update() {
   __set_PRIMASK(primask);
   
 #endif  
+#ifdef RECEIVER // -> компилируется приёмник
   
+  #if 0 // app.c строка 581 сначала заполняем буфер, потом StorePacket()
+    #if defined(ENABLE_AIRCOPY)
+      if (Mask & BK4819_REG_02_FSK_FIFO_ALMOST_FULL &&
+          gScreenToDisplay == DISPLAY_AIRCOPY &&
+          gAircopyState == AIRCOPY_TRANSFER && gAirCopyIsSendMode == 0) {
+        uint8_t i;
+
+        for (i = 0; i < 4; i++) {
+          g_FSK_Buffer[gFSKWriteIndex++] = BK4819_ReadRegister(BK4819_REG_5F);
+        }
+        AIRCOPY_StorePacket();
+      }
+    #endif
+  #endif
+
+  APP_myCheckRadioInterrupts();
+#endif    
+  //-----------------------------------------------------------------------------
+#ifndef RECEIVER // -> компилируется передатчик
   // cwTx("NSV");
   if(millis()-timer_1>=500){
-    timer_1=millis();
-    cwTx("NSV");
+    // timer_1=millis();
+    // cwTx("NSV");
+    
+    memset(my_FSK_Buffer,'1',36); // заполнить первые 12 байт символом '_'
+    if(flag_action){
+      flag_action=false;
+      RADIO_enableTX();
+	    BK4819_SendFSKData(my_FSK_Buffer);
+	    BK4819_SetupPowerAmplifier(0, 0);
+	    BK4819_ToggleGpioOut(BK4819_GPIO1_PIN29_PA_ENABLE, false);
+    }
+
+  //-----------------------------------------------------------------------------  
+	  // gAircopySendCountdown = 30;
+
     // uint32_t buff = millis();
     // const void *pBuffer = (const void *)&buff;
     // UART_Send(pBuffer, sizeof(buff));
   }
+#endif
   // SYSTEM_DelayMs(2 * 1000);
   // HELLOWORLD_key();
   // if(gNextTimeslice4000ms){
@@ -195,6 +278,7 @@ void HELLOWORLD_key(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
     case KEY_EXIT:
       gAppToDisplay = APP_SPLIT;
       gRequestDisplayScreen = DISPLAY_MAIN;
+      flag_action=true;
       break;
     default:
       break;
