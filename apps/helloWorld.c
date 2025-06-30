@@ -10,156 +10,78 @@
 // #include "../driver/bk4819.h"
 
 // cw dot length in ms
-#define CW_DOT_LEN 120
+// #define CW_DOT_LEN 120
 
 #define RECEIVER
 
-// Макрос для размещения строк во Flash
-// #define FLASH_STR(str) ((const uint8_t*)(str))
-
-// const uint8_t flash_msg[] __attribute__((section(".rodata"))) = "Hello from Flash!\r\n";
-
 uint16_t my_FSK_Buffer[36];
 
-bool flag_action = true;
+#define flag_action_1 (1 << 0)  // 0b00000001
+#define flag_action_2 (1 << 1)  // 0b00000010
 
-// static uint16_t cursor;
-uint32_t timer_1=0;
+uint8_t flag_action = 0;
+
 #if 0
-const uint8_t cwSymbTab[][5] = {
-  {1, 2},             // 0  A
-  {2, 1, 1, 1},       // 1  B
-  {2, 1, 2, 1},       // 2  C
-  {2, 1, 1},          // 3  D
-  {1},                // 4  E
-  {1, 1, 2, 1},       // 5  F
-  {2, 2, 1},          // 6  G
-  {1, 1, 1, 1},       // 7  H
-  {1, 1},             // 8  I
-  {1, 2, 2, 2},       // 9  J
-  {2, 1, 2},          // 10 K
-  {1, 2, 1, 1},       // 11 L
-  {2, 2},             // 12 M
-  {2, 1},             // 13 N
-  {2, 2, 2},          // 14 O
-  {1, 2, 2, 1},       // 15 P
-  {2, 2, 1, 2},       // 16 Q
-  {1, 2, 1},          // 17 R
-  {1, 1, 1},          // 18 S
-  {2},                // 19 T
-  {1, 1, 2},          // 20 U
-  {1, 1, 1, 2},       // 21 V
-  {1, 2, 2},          // 22 W
-  {2, 1, 1, 2},       // 23 X
-  {2, 1, 2, 2},       // 24 Y
-  {2, 2, 1, 1},       // 25 Z
-  {2, 2, 2, 2, 2},    // 26 0
-  {1, 2, 2, 2, 2},    // 27 1
-  {1, 1, 2, 2, 2},    // 28 2
-  {1, 1, 1, 2, 2},    // 29 3
-  {1, 1, 1, 1, 2},    // 30 4
-  {1, 1, 1, 1, 1},    // 31 5
-  {2, 1, 1, 1, 1},    // 32 6
-  {2, 2, 1, 1, 1},    // 33 7
-  {2, 2, 2, 1, 1},    // 34 8
-  {2, 2, 2, 2, 1}     // 35 9
-};
-#endif
-#if 0
-void cwSendSym(uint16_t len)
-{
-  // si5351.output_enable(SI5351_CLK0, 1);
-  // gen.EnableOutput(true);   // Turn ON the output - it defaults to OFF
-  // digitalWrite(2,HIGH);
-  RADIO_enableTX();
-  BK4819_TransmitTone(true, 1200);
-  // delay(len);
-  SYSTEM_DelayMs(len);
-  // si5351.output_enable(SI5351_CLK0, 0);  
-  // gen.EnableOutput(false);   // Turn ON the output - it defaults to OFF
-  // digitalWrite(2,LOW);
-  RADIO_disableTX();
+  // Проверка флага
+if (gFlags & FLAG_2000MS) {
+    // Действие
 }
-#endif
-#if 0
-void cwTxChar(char ch)
-{
-    uint8_t cwSym;
-    uint8_t tabIndex;
-    
-    tabIndex = 255;
-    if ((ch >= 65) && (ch <= 90))  tabIndex = ch - 65;  // A - Z
-    if ((ch >= 97) && (ch <= 122)) tabIndex = ch - 97;  // a - z
-    if ((ch >= 48) && (ch <= 57))  tabIndex = ch - 22;  // 0 - 9
 
-    if (tabIndex == 255)
-    {
-      SYSTEM_DelayMs(CW_DOT_LEN * 3);
-      return;
-    }
-    
-    for(uint8_t i = 0; i < 5; i++) 
-    {
-      cwSym = cwSymbTab[tabIndex][i];
-      if      (cwSym == 1) cwSendSym(CW_DOT_LEN);
-      else if (cwSym == 2) cwSendSym(CW_DOT_LEN * 3);
-      else continue;
-      SYSTEM_DelayMs(CW_DOT_LEN);
-    }
-
-    SYSTEM_DelayMs(CW_DOT_LEN * 2);
-}
-#endif
-#if 0
-void cwTx(char* msg)
-{
-  // digitalWrite(6,HIGH);
-  for(uint8_t i = 0; i < strlen(msg); i++) {
-    cwTxChar(msg[i]);
-  }
-  // digitalWrite(6,LOW );
-}
+// Сброс флага
+gFlags &= ~FLAG_2000MS;
 #endif
 
+// bool flag_action = true;
+// bool flag_action2 = false;
 
+#ifndef RECEIVER
+  uint32_t timer_1=0;
+#endif
+uint32_t timer_2=0;
 
 #ifdef RECEIVER
 uint8_t mygFSKWriteIndex=0;
 void APP_myCheckRadioInterrupts(void) {
-#if 0  
-  for(uint8_t i=0;i<36;++i){
-    my_FSK_Buffer[i]=i+1;
-  }
-  for(uint8_t i=0;i<36;++i){
-    UART_Send((const void *)&my_FSK_Buffer[i], 1);
-  }
-  UART_Send("\r\n", 2);
-#endif
+
   while (BK4819_ReadRegister(BK4819_REG_0C) & 1U) {
     
     // uint16_t Mask;
 
     // BK4819_WriteRegister(BK4819_REG_02, 0);
     // Mask = BK4819_ReadRegister(BK4819_REG_02);
-    
+    // UART_Send("s:", 2); 
+    // uint16_t res;
+    // res = Mask & BK4819_REG_02_FSK_FIFO_ALMOST_FULL;
+    // UART_Send((const void *)&Mask, sizeof(Mask)); 
+    // UART_Send("\r\n", 2);
+    // UART_Send((const void *)&res, sizeof(res));
+    // UART_Send("\r\n", 2);
+    for (uint8_t i = 0; i < 4; i++) {
+      my_FSK_Buffer[mygFSKWriteIndex++] = BK4819_ReadRegister(BK4819_REG_5F);
+      // uint16_t value = BK4819_ReadRegister(BK4819_REG_5F);
+      // UART_Send((const void *)&value, 1);
+    }
     // if (Mask & BK4819_REG_02_FSK_FIFO_ALMOST_FULL/* &&
         // gScreenToDisplay == DISPLAY_AIRCOPY &&
         // gAircopyState == AIRCOPY_TRANSFER && gAirCopyIsSendMode == 0*/) 
       // {
-      // UART_Send("1\r\n", 3);    
+      // UART_Send("1", 1);    
       // uint8_t i;
       
 
-      // for (i = 0; i < 4; i++) {
+      // for (uint8_t i = 0; i < 4; i++) {
         // my_FSK_Buffer[mygFSKWriteIndex++] = BK4819_ReadRegister(BK4819_REG_5F);
-        uint16_t value = BK4819_ReadRegister(BK4819_REG_5F);
-        UART_Send((const void *)&value, 1);
+        // uint16_t value = BK4819_ReadRegister(BK4819_REG_5F);
+        // UART_Send((const void *)&value, 1);
       // }
       // AIRCOPY_StorePacket();
       // mygFSKWriteIndex=0;
       // uint16_t Status;
       // Status = BK4819_ReadRegister(BK4819_REG_0B);
-      BK4819_PrepareFSKReceive();
+      // UART_Send((const void *)&Status, 1);
+      // UART_Send("\r\n", 2);
+      // UART_Send("Ok\r\n", 4);
+      // BK4819_PrepareFSKReceive();
       // const void *pBuffer = (const void *)&my_FSK_Buffer[0];
       // UART_Send(pBuffer, sizeof(&my_FSK_Buffer[0]));
       // for(uint8_t i=0;i<36;++i){
@@ -168,7 +90,13 @@ void APP_myCheckRadioInterrupts(void) {
       // if ((Status & 0x0010U) == 0/* && g_FSK_Buffer[0] == 0xABCD && g_FSK_Buffer[35] == 0xDCBA */) {
         // UART_Send(my_FSK_Buffer, sizeof(my_FSK_Buffer));
       // }
+      // flag_action2=true;
+      // Установка флага
+      // flag_action |= flag_action_2;
+      flag_action &= ~flag_action_2;
+
     // }
+
   }
 }
 #endif
@@ -228,8 +156,23 @@ void HELLOWORLD_update() {
       }
     #endif
   #endif
-
-  APP_myCheckRadioInterrupts();
+  if(millis()-timer_2>=1){
+    timer_2=millis();
+    APP_myCheckRadioInterrupts();
+  }
+  // if(flag_action2){
+    // flag_action2=false;
+  // }
+  // Проверка флага
+  if (!(flag_action & flag_action_2)) {
+    // Действие
+    // Сброс флага
+    // flag_action &= ~flag_action_2;
+    flag_action |= flag_action_2;
+    for(uint8_t i=0;i<36;++i){
+      UART_Send((const void *)&my_FSK_Buffer[i], 1);
+    }
+  }
 #endif    
   //-----------------------------------------------------------------------------
 #ifndef RECEIVER // -> компилируется передатчик
@@ -239,16 +182,8 @@ void HELLOWORLD_update() {
     // cwTx("NSV");
     
     // memset(my_FSK_Buffer,'1',36); // заполнить первые 12 байт символом '_'
-    for(uint8_t i=0;i<36;++i){
-      my_FSK_Buffer[i]=i+1;
-    }
-    if(flag_action){
-      flag_action=false;
-      RADIO_enableTX();
-	    BK4819_SendFSKData(&my_FSK_Buffer[0]);
-	    BK4819_SetupPowerAmplifier(0, 0);
-	    BK4819_ToggleGpioOut(BK4819_GPIO1_PIN29_PA_ENABLE, false);
-    }
+    
+    
 
   //-----------------------------------------------------------------------------  
 	  // gAircopySendCountdown = 30;
@@ -256,6 +191,26 @@ void HELLOWORLD_update() {
     // uint32_t buff = millis();
     // const void *pBuffer = (const void *)&buff;
     // UART_Send(pBuffer, sizeof(buff));
+  }
+  // if(flag_action){
+    // flag_action=false;
+  // Проверка флага
+  if (flag_action & flag_action_1) {
+    // Сброс флага
+    flag_action &= ~flag_action_1;
+    for(uint8_t i=0;i<36;++i){
+      my_FSK_Buffer[i]=i+1;
+    }
+
+    my_FSK_Buffer[0] = 0xABCD;
+    // my_FSK_Buffer[1] = (gAirCopyBlockNumber & 0x3FF) << 6;
+    my_FSK_Buffer[35] = 0xDCBA;
+    for(uint8_t i=0;i<10;i++){
+      RADIO_enableTX();
+      BK4819_SendFSKData(my_FSK_Buffer);
+      BK4819_SetupPowerAmplifier(0, 0);
+      BK4819_ToggleGpioOut(BK4819_GPIO1_PIN29_PA_ENABLE, false);
+    }
   }
 #endif
   // SYSTEM_DelayMs(2 * 1000);
@@ -296,11 +251,19 @@ void HELLOWORLD_key(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld) {
       helloWorldUpdate(cursor, Key - KEY_0);
       break;
   #endif    
-    case KEY_MENU:
+    // case KEY_MENU:
     case KEY_EXIT:
       gAppToDisplay = APP_SPLIT;
       gRequestDisplayScreen = DISPLAY_MAIN;
-      flag_action=true;
+      // flag_action=true;
+      // Установка флага
+      flag_action |= flag_action_1;
+      #ifdef RECEIVER
+        mygFSKWriteIndex=0;
+        BK4819_PrepareFSKReceive();
+        // Установка флага
+        flag_action |= flag_action_2;
+      #endif
       break;
     default:
       break;
@@ -351,7 +314,7 @@ void HELLOWORLD_render() {
     memset(gFrameBuffer[line], 0, LCD_WIDTH);
   }
 #endif
-  UI_PrintStringSmallest("Hello World app", 0, 32, false, true);
+  // UI_PrintStringSmallest("Hello World app", 0, 32, false, true);
 
   ST7565_BlitFullScreen();
 }
