@@ -791,9 +791,9 @@ void BK4819_SendFSKData(uint16_t *pData) {
 
   SYSTEM_DelayMs(20);
 
-  BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_3F_FSK_TX_FINISHED);
-  BK4819_WriteRegister(BK4819_REG_59, 0x8068);
-  BK4819_WriteRegister(BK4819_REG_59, 0x0068);
+  BK4819_WriteRegister(BK4819_REG_3F, BK4819_REG_3F_FSK_TX_FINISHED); // BK4819_REG_3F_FSK_TX_FINISHED // (1<<0)
+  BK4819_WriteRegister(BK4819_REG_59, 0x8068); // 0x8068 // 0x0B01
+  BK4819_WriteRegister(BK4819_REG_59, 0x0068); // 0x0068 // 0x0016
 
   for (i = 0; i < 36; i++) {
     BK4819_WriteRegister(BK4819_REG_5F, pData[i]);
@@ -801,7 +801,7 @@ void BK4819_SendFSKData(uint16_t *pData) {
 
   SYSTEM_DelayMs(20);
 
-  BK4819_WriteRegister(BK4819_REG_59, 0x2868);
+  BK4819_WriteRegister(BK4819_REG_59, 0x2868); // 0x2868 // 0x1614
 
   while (Timeout) {
     if (BK4819_ReadRegister(BK4819_REG_0C) & 1U) {
